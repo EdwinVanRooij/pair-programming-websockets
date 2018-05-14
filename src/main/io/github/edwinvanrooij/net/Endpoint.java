@@ -21,15 +21,18 @@ import static io.github.edwinvanrooij.Util.log;
 public class Endpoint {
 
     private MessageBus bus;
-    private Session currentSession;
     private MessageHandler messageHandler;
 
     @OnOpen
-    public void open(Session session) {
+    public void open(Session session) throws IOException {
+        // WS connection opened
         log("Connection '%s' opened.", session.getId());
         session.setMaxIdleTimeout(MAX_IDLE_TIMEOUT * 1000 * 60); // starts at ms --> * 1000 = seconds, * 60 = minutes
 
-        currentSession = session;
+        // Send a message back; success!
+        session.getBasicRemote().sendText(Message.generateJson(200, "Successfully opened connection!"));
+
+        // Initialize MessageBus and handle new messages from queue
         bus = new MessageBus();
         messageHandler = new MessageHandler() {
             @Override
