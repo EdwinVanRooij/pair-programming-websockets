@@ -10,7 +10,7 @@ import static io.github.edwinvanrooij.Util.log;
 
 public class MessageBus {
 
-    public static String QUEUE_NAME = "dpi_pair_programming_queue";
+    public static String EXCHANGE_NAME = "dpi_pair_programming_exchange";
 
     private Session session;
 
@@ -18,16 +18,17 @@ public class MessageBus {
         this.session = session;
     }
 
-    public void produceMessage(String json) {
+    public void produceMessage(String message) {
         try {
             ConnectionFactory factory = new ConnectionFactory();
             factory.setHost("localhost");
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
 
-            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-            channel.basicPublish("", QUEUE_NAME, null, json.getBytes());
-            log("Sent '%s' to queue.", json);
+            channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT);
+
+            channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes("UTF-8"));
+            System.out.println(" [x] Sent '" + message + "'");
 
             channel.close();
             connection.close();
@@ -43,9 +44,12 @@ public class MessageBus {
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
 
-            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+            channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT);
+            String queueName = channel.queueDeclare().getQueue();
+//            String queueName = session.getId();
+            channel.queueBind(queueName, EXCHANGE_NAME, "");
 
-            log("Waiting for messages. To exit press CTRL+C");
+            System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 
             Consumer consumer = new DefaultConsumer(channel) {
                 @Override
@@ -55,8 +59,7 @@ public class MessageBus {
                     handler.handleMessage(session, message);
                 }
             };
-            channel.basicConsume(QUEUE_NAME, true, consumer);
-
+            channel.basicConsume(queueName, true, consumer);
         } catch (IOException | TimeoutException e) {
             e.printStackTrace();
         }
