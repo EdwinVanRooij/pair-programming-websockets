@@ -36,7 +36,7 @@ dependencies {
 
 jar {
 
-    archiveName = "DpiPairProgramming.jar"
+    archiveName = "pair-programming-websockets.jar"
 
     from {
         configurations.runtime.collect {

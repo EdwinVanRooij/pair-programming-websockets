@@ -2,6 +2,7 @@ package io.github.edwinvanrooij.bus;
 
 import com.rabbitmq.client.*;
 
+import javax.websocket.Session;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
@@ -11,8 +12,10 @@ public class MessageBus {
 
     public static String QUEUE_NAME = "dpi_pair_programming_queue";
 
-    public MessageBus() {
+    private Session session;
 
+    public MessageBus(Session session) {
+        this.session = session;
     }
 
     public void produceMessage(String json) {
@@ -49,7 +52,7 @@ public class MessageBus {
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body)
                         throws IOException {
                     String message = new String(body, "UTF-8");
-                    handler.handleMessage(message);
+                    handler.handleMessage(session, message);
                 }
             };
             channel.basicConsume(QUEUE_NAME, true, consumer);

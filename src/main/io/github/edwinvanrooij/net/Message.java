@@ -5,15 +5,13 @@ import com.google.gson.Gson;
 public class Message {
     private static Gson gson = new Gson();
 
-    private int code;
     private String message;
 
-    public Message(int code, String message) {
-        this.code = code;
+    public Message(String message) {
         this.message = message;
     }
 
-    public static String generateJson(int code, String message) {
-        return gson.toJson(new Message(code, message));
+    public static String generateJson(String message) {
+        return gson.toJson(new Message(message));
     }
 }

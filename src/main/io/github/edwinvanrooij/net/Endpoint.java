@@ -21,7 +21,6 @@ import static io.github.edwinvanrooij.Util.log;
 public class Endpoint {
 
     private MessageBus bus;
-    private MessageHandler messageHandler;
 
     @OnOpen
     public void open(Session session) throws IOException {
@@ -30,17 +29,23 @@ public class Endpoint {
         session.setMaxIdleTimeout(MAX_IDLE_TIMEOUT * 1000 * 60); // starts at ms --> * 1000 = seconds, * 60 = minutes
 
         // Send a message back; success!
-        session.getBasicRemote().sendText(Message.generateJson(200, "Successfully opened connection!"));
+        session.getBasicRemote().sendText(Message.generateJson("Successfully opened connection!"));
 
         // Initialize MessageBus and handle new messages from queue
-        bus = new MessageBus();
-        messageHandler = new MessageHandler() {
+        bus = new MessageBus(session);
+        bus.consumeMessage(new MessageHandler() {
             @Override
-            public void handleMessage(String text) {
+            public void handleMessage(Session session, String text) {
                 log("From 'handleMessage' -> queue: '%s'", text);
+                try {
+                    if (session.isOpen()) {
+                        session.getBasicRemote().sendText(Message.generateJson(text));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        };
-        bus.consumeMessage(messageHandler);
+        });
     }
 
     @OnClose
