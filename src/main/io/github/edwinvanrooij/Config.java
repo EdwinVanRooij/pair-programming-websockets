@@ -6,7 +6,7 @@ package io.github.edwinvanrooij;
  */
 public class Config {
     // Port of the SocketServer
-    public static final int PORT = 8085;
+    public static final int PORT = 8086;
 
     // Max host timeout
     public static final int MAX_IDLE_TIMEOUT = 30; // in minutes

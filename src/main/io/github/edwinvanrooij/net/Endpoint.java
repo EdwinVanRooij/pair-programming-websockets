@@ -63,4 +63,4 @@ public class Endpoint {
         log("From 'handleMessage' -> websocket '%s': %s", session.getId(), message);
         bus.produceMessage(message);
     }
-}
+
