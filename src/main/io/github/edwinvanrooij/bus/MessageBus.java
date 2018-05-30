@@ -10,12 +10,10 @@ import static io.github.edwinvanrooij.Util.log;
 
 public class MessageBus {
 
-    public static String EXCHANGE_NAME = "dpi_pair_programming_exchange";
+    private String exchangeName;
 
-    private Session session;
-
-    public MessageBus(Session session) {
-        this.session = session;
+    public MessageBus(String exchangeName) {
+        this.exchangeName = exchangeName;
     }
 
     public void produceMessage(String message) {
@@ -25,9 +23,9 @@ public class MessageBus {
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
 
-            channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT);
+            channel.exchangeDeclare(exchangeName, BuiltinExchangeType.FANOUT);
 
-            channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes("UTF-8"));
+            channel.basicPublish(exchangeName, "", null, message.getBytes("UTF-8"));
             System.out.println(" [x] Sent '" + message + "'");
 
             channel.close();
@@ -37,17 +35,18 @@ public class MessageBus {
         }
     }
 
-    public void consumeMessage(MessageHandler handler) {
+    public void consumeMessage(MessageHandler handler, String queueName) {
         try {
             ConnectionFactory factory = new ConnectionFactory();
             factory.setHost("localhost");
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
 
-            channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT);
-            String queueName = channel.queueDeclare().getQueue();
+            channel.exchangeDeclare(exchangeName, BuiltinExchangeType.FANOUT);
+            channel.queueDeclare(queueName, false, false, false, null);
+//            String queueName = channel.queueDeclare().getQueue();
 //            String queueName = session.getId();
-            channel.queueBind(queueName, EXCHANGE_NAME, "");
+            channel.queueBind(queueName, exchangeName, "");
 
             System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 
@@ -56,7 +55,7 @@ public class MessageBus {
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body)
                         throws IOException {
                     String message = new String(body, "UTF-8");
-                    handler.handleMessage(session, message);
+                    handler.handleMessage(message);
                 }
             };
             channel.basicConsume(queueName, true, consumer);

@@ -3,5 +3,5 @@ package io.github.edwinvanrooij.bus;
 import javax.websocket.Session;
 
 public abstract class MessageHandler {
-    public abstract void handleMessage(Session session, String text);
+    public abstract void handleMessage(String text);
 }
