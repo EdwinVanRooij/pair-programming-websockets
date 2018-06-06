@@ -95,6 +95,7 @@ public class Endpoint {
     }
 
     private void handleEventVersion2(Event e, Session s) {
-        System.out.println(String.format("Event version 2 is not yet implemented. Stay tuned.\nEvent was '%s'", e.toString()));
+        System.out.println(String.format("Handling event for version 2.\nEvent was '%s'", e.toString()));
+        handleEventVersion1(e, s);
     }
 }
