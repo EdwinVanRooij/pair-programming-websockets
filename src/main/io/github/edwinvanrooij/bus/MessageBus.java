@@ -19,7 +19,11 @@ public class MessageBus {
     public void produceMessage(String message) {
         try {
             ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost("localhost");
+            factory.setHost("145.93.62.41");
+
+            factory.setUsername("guest");
+            factory.setPassword("guest");
+
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
 
@@ -38,7 +42,7 @@ public class MessageBus {
     public void consumeMessage(MessageHandler handler, String queueName) {
         try {
             ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost("localhost");
+            factory.setHost("145.93.62.41");
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
 
