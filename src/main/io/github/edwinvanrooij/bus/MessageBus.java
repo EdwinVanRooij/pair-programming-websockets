@@ -1,6 +1,7 @@
 package io.github.edwinvanrooij.bus;
 
 import com.rabbitmq.client.*;
+import io.github.edwinvanrooij.Const;
 
 import javax.websocket.Session;
 import java.io.IOException;
@@ -19,10 +20,10 @@ public class MessageBus {
     public void produceMessage(String message) {
         try {
             ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost("145.93.62.41");
+            factory.setHost(Const.IP);
 
-            factory.setUsername("guest");
-            factory.setPassword("guest");
+//            factory.setUsername("guest");
+//            factory.setPassword("guest");
 
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
@@ -42,7 +43,7 @@ public class MessageBus {
     public void consumeMessage(MessageHandler handler, String queueName) {
         try {
             ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost("145.93.62.41");
+            factory.setHost(Const.IP);
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
 
